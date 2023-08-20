@@ -18,6 +18,7 @@ public class CardDelivery {
 
    @Test
     void shouldRegisterIfDateIsMoreThanOneYear() {
+        open("http://localhost:9999");
         $("[data-test-id=city] input").setValue("Во");
         $(byText("Волгоград")).click();
         $("[data-test-id=date] [value]").click();
