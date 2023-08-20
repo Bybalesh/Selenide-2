@@ -38,22 +38,29 @@ public class DeliveryCardTest {
     }
     @Test    
     public void shouldSubmitRequest(){
-     open("http://localhost:9999");
+    DataGenerator dataGenerator = new DataGenerator();
 
-    $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
-    $("[placeholder='Город']").setValue(city);
-        $("[placeholder='Дата встречи']").doubleClick().sendKeys(getFutureDate(3));
+    @Test
+    void shouldSubmitRequest() {
+        String name = dataGenerator.makeName();
+        String phone = dataGenerator.makePhone();
+        String city = dataGenerator.makeCity();
+
+        open("http://localhost:9999");
+        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[placeholder='Город']").setValue(city);
+        $("[placeholder='Дата встречи']").doubleClick().sendKeys(dataGenerator.forwardDate(3));
         $("[name=name]").setValue(name);
         $("[name=phone]").setValue(phone);
         $(".checkbox__box").click();
         $(".button__text").click();
         $(withText("Успешно")).shouldBe(visible);
         $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(Keys.BACK_SPACE);
-        $("[placeholder='Дата встречи']").doubleClick().sendKeys(getFutureDate(5));
+        $("[placeholder='Дата встречи']").doubleClick().sendKeys(dataGenerator.forwardDate(5));
         $(".button__text").click();
         $(withText("У вас уже запланирована встреча на другую дату. Перепланировать?")).waitUntil(visible, 15000);
         $("[data-test-id=replan-notification] button.button").click();
-        $(withText("Успешно")).waitUntil(visible, 15000);    
+        $(withText("Успешно")).waitUntil(visible, 15000);
     }
 
     }
