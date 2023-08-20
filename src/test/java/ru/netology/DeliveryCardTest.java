@@ -36,5 +36,24 @@ public class DeliveryCardTest {
          .shouldHave(Condition.exactText("Встреча успешно забронирована на " + getFutureDate(3)));
 
     }
+    @Test    
+    public void shouldSubmitRequest(){
+     open("http://localhost:9999");
+
+    $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
+    $("[placeholder='Город']").setValue(city);
+        $("[placeholder='Дата встречи']").doubleClick().sendKeys(getFutureDate(3));
+        $("[name=name]").setValue(name);
+        $("[name=phone]").setValue(phone);
+        $(".checkbox__box").click();
+        $(".button__text").click();
+        $(withText("Успешно")).shouldBe(visible);
+        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[placeholder='Дата встречи']").doubleClick().sendKeys(getFutureDate(5));
+        $(".button__text").click();
+        $(withText("У вас уже запланирована встреча на другую дату. Перепланировать?")).waitUntil(visible, 15000);
+        $("[data-test-id=replan-notification] button.button").click();
+        $(withText("Успешно")).waitUntil(visible, 15000);    
+    }
 
     }
