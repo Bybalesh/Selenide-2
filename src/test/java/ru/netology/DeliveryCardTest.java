@@ -1,66 +1,43 @@
-package ru.netology;
-import com.codeborne.selenide.Condition;
-import org.junit.jupiter.api.Test;
+package ru.netology
 
-import com.codeborne.selenide.SelenideElement;
-import org.openqa.selenium.Keys;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import static com.codeborne.selenide.Condition.exactText;
-import static com.codeborne.selenide.Selenide.*;
+import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.open;
 
-public class DeliveryCardTest {
-    private String getFutureDate(int daysToAdd) {
-        LocalDate currentDate = LocalDate.now();
-        LocalDate futureDate = currentDate.plusDays(daysToAdd);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        String formattedDate = futureDate.format(formatter);
-        return formattedDate;
+
+public class CardDelivery {
+    private String generateDate(int addDays, String pattern){
+        return LocalDate.now().plusDays(addDays).format(DateTimerFormatter.ofPattern(pattern));
     }
+
     @Test
-    public void shouldSuccessDeliveryCardRegistration() {
+    public void ShouldBeSuccessCompleted(){
         open("http://localhost:9999");
-
-        $("[data-test-id='city'] input").setValue("Омск");
-        $(".calendar-input__custom-control input").doubleClick().sendKeys(getFutureDate(3));
-
-        $("[data-test-id='name'] input").setValue("Васильев Василий");
-        $("[data-test-id='phone'] input").setValue("+79168268999");
+        $("[data-test-id=city] input").setValue("Во");
+        $(byText("Волгоград")).click();
+        $("[data-test-id=date] [value]").click();
+        LocalDate dateDefault = LocalDate.now().plusDays(3);
+        LocalDate dateOfMeeting = LocalDate.now().plusDays(30);
+        String stringToSearch = dateOfMeeting.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        String dayToSearch = String.valueOf(dateOfMeeting.getDayOfMonth());
+        if (dateOfMeeting.getMonthValue()>dateDefault.getMonthValue()|dateOfMeeting.getYear()>dateDefault.getYear()){
+            $(".calendar__arrow_direction_right[data-step='1']").click();
+        }
+        $$("td.calendar__day").find(exactText(dayToSearch)).click();
+        $("[data-test-id='name'] input").setValue("Петров Петр Петрович");
+        $("[data-test-id='phone'] input").setValue("+78567324855");
         $("[data-test-id='agreement']").click();
-        $$("button").find(exactText("Забронировать")). click();
-        $("[data-test-id='notification'] .notification__content")
-         .shouldBe(Condition.visible, Duration.ofSeconds(14))
-         .shouldHave(Condition.exactText("Встреча успешно забронирована на " + getFutureDate(3)));
+        $("button.button").click();
+        $(".notification__content")
+            .shouldBe(Condition.visible, Duration.ofSeconds(15));
+            .shouldHave(Condition.exactText("Встреча успешно забронирована на " + currentDate));
 
     }
-    @Test    
-    public void shouldSubmitRequest(){
-    DataGenerator dataGenerator = new DataGenerator();
 
-    @Test
-    void shouldSubmitRequest() {
-        String name = dataGenerator.makeName();
-        String phone = dataGenerator.makePhone();
-        String city = dataGenerator.makeCity();
-
-        open("http://localhost:9999");
-        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
-        $("[placeholder='Город']").setValue(city);
-        $("[placeholder='Дата встречи']").doubleClick().sendKeys(dataGenerator.forwardDate(3));
-        $("[name=name]").setValue(name);
-        $("[name=phone]").setValue(phone);
-        $(".checkbox__box").click();
-        $(".button__text").click();
-        $(withText("Успешно")).shouldBe(visible);
-        $("input[placeholder=\"Дата встречи\"]").doubleClick().sendKeys(Keys.BACK_SPACE);
-        $("[placeholder='Дата встречи']").doubleClick().sendKeys(dataGenerator.forwardDate(5));
-        $(".button__text").click();
-        $(withText("У вас уже запланирована встреча на другую дату. Перепланировать?")).waitUntil(visible, 15000);
-        $("[data-test-id=replan-notification] button.button").click();
-        $(withText("Успешно")).waitUntil(visible, 15000);
-    }
-
-    }
+}
